@@ -16,7 +16,7 @@ const PORT = process.env.PORT;
 
 // The following app.get() will call the correct helper function to retrieve the API information.
 app.get('/location', getGoogleLocation); //google API
-
+app.get('/weather', getWeather); //darkskies API
 
 // Tells the server to listen to the PORT, and console.logs to tell us it's on.
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -40,3 +40,33 @@ function LocationResult(search, formatted, lat, lng){
   this.latitude = lat,
   this.longitude = lng
 }
+
+// Weather helper function
+function getWeather(request, response) {
+  const url = `https://api.darksky.net/forecast/${process.env.DARK_SKY_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
+  return superagent.get(url)
+    .then(result => {
+      let weatherData = [];
+      weatherData = result.body.daily.data.map((value)=>{
+        console.log(value.time)
+        console.log(value.summary)
+
+
+        return new WeatherResult(value.time,value.summary)
+      })
+      console.log(weatherData);
+      response.send(weatherData);
+    })
+    .catch(error => console.log(`error message: ${error}`))
+}
+
+// Constructor function for Darksky API
+function WeatherResult(time, forecast){
+
+  this.time = new Date(time * 1000).toString().slice(0,15),
+  this.forecast = forecast
+  console.log('time',this.time)
+  console.log('forcast',this.forecast)
+
+}
+
