@@ -27,13 +27,16 @@ function getGoogleLocation(request, response) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GOOGLE_API_KEY}`;
   return superagent.get(url)
     .then(result => {
-      const locationResult = {
-        search_query: request.query.data,
-        formatted_query: result.body.results[0].formatted_address,
-        latitude: result.body.results[0].geometry.location.lat,
-        longitude: result.body.results[0].geometry.location.lng
-      }
-      response.send(locationResult);
+
+      response.send(new LocationResult(request.query.data,result.body.results[0].formatted_address,result.body.results[0].geometry.location.lat,result.body.results[0].geometry.location.lng));
     })
     .catch(error => console.log(`error message: ${error}`));
+}
+
+// Contructor function for Google API
+function LocationResult(search, formatted, lat, lng){
+  this.search_query = search,
+  this.formatted_query = formatted,
+  this.latitude = lat,
+  this.longitude = lng
 }
