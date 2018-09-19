@@ -75,12 +75,13 @@ function getRestaurants(request, response) {
 
 //Movies helper function
 function getMovies(request, response) {
-  const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.TMDB_APIv3_KEY}query=${request.query.data.search_query}`
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.TMDB_APIv3_KEY}&query=${request.query.data.search_query}`
   return superagent.get(url)
     .then(result => {
       let movieData = [];
-      movieData = result.body.map(value => {
-        return new MovieResults(value.title, value.overview, value.average_votes, value.total_votes, value.image_url, value.popularity, value.released_on);
+      // console.log(result.body.title);
+      movieData = result.body.results.map(value => {
+        return new MovieResults(value.title, value.overview, value.vote_average, value.vote_count, value.poster_path, value.popularity, value.release_date);
       })
       response.send(movieData);
     })
@@ -119,7 +120,7 @@ function MovieResults(title, overview, average, total, image, popularity, releas
     this.overview = overview,
     this.average_votes = average,
     this.total_votes = total,
-    this.image_url = image,
+    this.image_url = `https://image.tmdb.org/t/p/w500${image}`,
     this.popularity = popularity,
     this.released_on = released
 }
