@@ -5,7 +5,7 @@ const superagent = require('superagent');
 const cors = require('cors');
 const app = express();
 
-
+// Tells express to use 'cors' for cross-origin resource sharing
 app.use(cors());
 
 require('dotenv').config();
