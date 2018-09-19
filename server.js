@@ -1,12 +1,10 @@
 'use strict'
-
+// These variables create the connection to the dependencies.
 const express = require('express');
-
 const superagent = require('superagent');
-
 const cors = require('cors');
-
 const app = express();
+
 
 app.use(cors());
 
