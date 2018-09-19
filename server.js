@@ -18,6 +18,7 @@ const PORT = process.env.PORT;
 app.get('/location', getGoogleLocation); //google API
 app.get('/weather', getWeather); //darkskies API
 app.get('/yelp', getRestaurants); // yelp API
+app.get('/movies', getMovies); // The Movie Database API
 
 // Tells the server to listen to the PORT, and console.logs to tell us it's on.
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -72,6 +73,21 @@ function getRestaurants(request, response) {
     .catch(error => processError(error, response));
 }
 
+//Movies helper function
+function getMovies(request, response) {
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.TMDB_APIv3_KEY}query=${request.query.data.search_query}`
+  return superagent.get(url)
+    .then(result => {
+      let movieData = [];
+      movieData = result.body.map(value => {
+        return new MovieResults(value.title, value.overview, value.average_votes, value.total_votes, value.image_url, value.popularity, value.released_on);
+      })
+      response.send(movieData);
+    })
+    .catch(error => processError(error, response));
+}
+
+// Error handeling function
 function processError(err, res) {
   console.error(err);
   if (res) res.status(500).send('Sorry, something went wrong');
@@ -96,3 +112,14 @@ function RestaurantResult(name, image, price, rating, url) {
     this.url = url
 }
 
+//Constructor function for The Movie Database API
+//Constructor function for Yelp API
+function MovieResults(title, overview, average, total, image, popularity, released) {
+  this.title = title,
+    this.overview = overview,
+    this.average_votes = average,
+    this.total_votes = total,
+    this.image_url = image,
+    this.popularity = popularity,
+    this.released_on = released
+}
