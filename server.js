@@ -17,6 +17,7 @@ const PORT = process.env.PORT;
 // The following app.get() will call the correct helper function to retrieve the API information.
 app.get('/location', getGoogleLocation); //google API
 app.get('/weather', getWeather); //darkskies API
+app.get('/yelp', getRestaurants); // yelp API
 
 // Tells the server to listen to the PORT, and console.logs to tell us it's on.
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -28,17 +29,17 @@ function getGoogleLocation(request, response) {
   return superagent.get(url)
     .then(result => {
 
-      response.send(new LocationResult(request.query.data,result.body.results[0].formatted_address,result.body.results[0].geometry.location.lat,result.body.results[0].geometry.location.lng));
+      response.send(new LocationResult(request.query.data, result.body.results[0].formatted_address, result.body.results[0].geometry.location.lat, result.body.results[0].geometry.location.lng));
     })
-    .catch(error => console.log(`error message: ${error}`));
+    .catch(error => processError(error, response));
 }
 
 // Contructor function for Google API
-function LocationResult(search, formatted, lat, lng){
+function LocationResult(search, formatted, lat, lng) {
   this.search_query = search,
-  this.formatted_query = formatted,
-  this.latitude = lat,
-  this.longitude = lng
+    this.formatted_query = formatted,
+    this.latitude = lat,
+    this.longitude = lng
 }
 
 // Weather helper function
@@ -47,26 +48,51 @@ function getWeather(request, response) {
   return superagent.get(url)
     .then(result => {
       let weatherData = [];
-      weatherData = result.body.daily.data.map((value)=>{
-        console.log(value.time)
-        console.log(value.summary)
-
-
-        return new WeatherResult(value.time,value.summary)
+      weatherData = result.body.daily.data.map((value) => {
+        return new WeatherResult(value.time, value.summary)
       })
-      console.log(weatherData);
       response.send(weatherData);
     })
-    .catch(error => console.log(`error message: ${error}`))
+    .catch(error => processError(error, response));
 }
 
+// Restraurant helper function
+function getRestaurants(request, response) {
+  const url = `https://api.yelp.com/v3/businesses/search?location=${request.query.data.search_query}`;
+
+  superagent.get(url)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+    .then(result => {
+      let yelpData = [];
+      yelpData = result.body.businesses.map((value) => {
+        return new RestaurantResult(value.name, value.image_url, value.price, value.rating, value.url);
+      })
+      response.send(yelpData);
+    })
+    .catch(error => processError(error, response));
+}
+
+function processError(err, res) {
+  console.error(err);
+  if (res) res.status(500).send('Sorry, something went wrong');
+}
+
+
+
+// CONSTRUCTOR FUNCTIONS
+
 // Constructor function for Darksky API
-function WeatherResult(time, forecast){
+function WeatherResult(time, forecast) {
+  this.time = new Date(time * 1000).toString().slice(0, 15),
+    this.forecast = forecast
+}
 
-  this.time = new Date(time * 1000).toString().slice(0,15),
-  this.forecast = forecast
-  console.log('time',this.time)
-  console.log('forcast',this.forecast)
-
+//Constructor function for Yelp API
+function RestaurantResult(name, image, price, rating, url) {
+  this.name = name,
+    this.image_url = image,
+    this.price = price,
+    this.rating = rating,
+    this.url = url
 }
 
