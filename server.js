@@ -23,7 +23,41 @@ app.get('/movies', getMovies); // The Movie Database API
 // Tells the server to listen to the PORT, and console.logs to tell us it's on.
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
-// HELPER FUNCTIONS BELOW //
+// HELPER FUNCTIONS AND CONSTRUCTORS BELOW //
+
+// Constructor function for Darksky API
+function WeatherResult(weather) {
+  this.time = new Date(weather.time * 1000).toString().slice(0, 15),
+    this.forecast = weather.summary
+}
+
+//Constructor function for Yelp API
+function RestaurantResult(restaurant) {
+  this.name = restaurant.name,
+    this.image_url = restaurant.image_url,
+    this.price = restaurant.price,
+    this.rating = restaurant.rating,
+    this.url = restaurant.url
+}
+
+
+//Constructor function for The Movie Database API
+//Constructor function for Yelp API
+function MovieResults(movie) {
+  this.title = movie.title,
+    this.overview = movie.overview,
+    this.average_votes = movie.vote_average,
+    this.total_votes = movie.vote_count,
+    this.image_url = `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+    this.popularity = movie.popularity,
+    this.released_on = movie.release_date
+}
+
+
+
+
+
+
 // Google helper function refactored prior to lab start.
 function getGoogleLocation(request, response) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GOOGLE_API_KEY}`;
@@ -49,8 +83,8 @@ function getWeather(request, response) {
   return superagent.get(url)
     .then(result => {
       let weatherData = [];
-      weatherData = result.body.daily.data.map((value) => {
-        return new WeatherResult(value.time, value.summary)
+      weatherData = result.body.daily.data.map((weather) => {
+        return new WeatherResult(weather)
       })
       response.send(weatherData);
     })
@@ -65,8 +99,8 @@ function getRestaurants(request, response) {
     .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .then(result => {
       let yelpData = [];
-      yelpData = result.body.businesses.map((value) => {
-        return new RestaurantResult(value.name, value.image_url, value.price, value.rating, value.url);
+      yelpData = result.body.businesses.map((restaurant) => {
+        return new RestaurantResult(restaurant);
       })
       response.send(yelpData);
     })
@@ -79,9 +113,8 @@ function getMovies(request, response) {
   return superagent.get(url)
     .then(result => {
       let movieData = [];
-      // console.log(result.body.title);
-      movieData = result.body.results.map(value => {
-        return new MovieResults(value.title, value.overview, value.vote_average, value.vote_count, value.poster_path, value.popularity, value.release_date);
+      movieData = result.body.results.map(movie => {
+        return new MovieResults(movie);
       })
       response.send(movieData);
     })
@@ -96,31 +129,5 @@ function processError(err, res) {
 
 
 
-// CONSTRUCTOR FUNCTIONS
 
-// Constructor function for Darksky API
-function WeatherResult(time, forecast) {
-  this.time = new Date(time * 1000).toString().slice(0, 15),
-    this.forecast = forecast
-}
 
-//Constructor function for Yelp API
-function RestaurantResult(name, image, price, rating, url) {
-  this.name = name,
-    this.image_url = image,
-    this.price = price,
-    this.rating = rating,
-    this.url = url
-}
-
-//Constructor function for The Movie Database API
-//Constructor function for Yelp API
-function MovieResults(title, overview, average, total, image, popularity, released) {
-  this.title = title,
-    this.overview = overview,
-    this.average_votes = average,
-    this.total_votes = total,
-    this.image_url = `https://image.tmdb.org/t/p/w500${image}`,
-    this.popularity = popularity,
-    this.released_on = released
-}
