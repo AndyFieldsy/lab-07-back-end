@@ -1,7 +1,7 @@
 # lab-06-back-end
 
 **Author**: David Chambers and Joey Eisenzimmer and Andy Fields
-**Version**: 1.1.0
+**Version**: 1.2.0
 
 ## Overview
 We are creating a back end server to provide requested information about a cities weather, restaurants, movies, and news.
@@ -23,10 +23,12 @@ This project uses the following technologies:
 ## Change Log
 
 09-18-2018 10:00am - (DC/JE) Created initial scaffolding
+
 09-19-2018 9:15am - (DC/AF) Created initial scaffolding
 09-19-2018 10:30am - (AF/DC) Created format data refactor comments and Weather
 09-19-2018 12:00pm - (DC/AF) Created Yelp and Movies
 09-19-2018 1:30pm - (AF/DC) Wrapup
+09-19-2018 10:00pm - (DC) Refactored Code
 
 ## Credits and Collaborations
 * Front end starter code provided by Samm Hamm and Allie Grampa
