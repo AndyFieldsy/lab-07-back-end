@@ -27,28 +27,28 @@ app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
 // Constructor function for Darksky API
 function WeatherResult(weather) {
-  this.time = new Date(weather.time * 1000).toString().slice(0, 15),
-    this.forecast = weather.summary
+  this.time = new Date(weather.time * 1000).toString().slice(0, 15);
+  this.forecast = weather.summary;
 }
 
 //Constructor function for Yelp API
 function RestaurantResult(restaurant) {
-  this.name = restaurant.name,
-    this.image_url = restaurant.image_url,
-    this.price = restaurant.price,
-    this.rating = restaurant.rating,
-    this.url = restaurant.url
+  this.name = restaurant.name;
+  this.image_url = restaurant.image_url;
+  this.price = restaurant.price;
+  this.rating = restaurant.rating;
+  this.url = restaurant.url;
 }
 
 //Constructor function for The Movie Database API
 function MovieResults(movie) {
-  this.title = movie.title,
-    this.overview = movie.overview,
-    this.average_votes = movie.vote_average,
-    this.total_votes = movie.vote_count,
-    this.image_url = `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-    this.popularity = movie.popularity,
-    this.released_on = movie.release_date
+  this.title = movie.title;
+  this.overview = movie.overview;
+  this.average_votes = movie.vote_average;
+  this.total_votes = movie.vote_count;
+  this.image_url = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+  this.popularity = movie.popularity;
+  this.released_on = movie.release_date;
 }
 
 // Google helper function refactored prior to lab start.
@@ -63,10 +63,10 @@ function getLocation(request, response) {
 
 // Contructor function for Google API
 function LocationResult(search, location) {
-  this.search_query = search,
-    this.formatted_query = location.body.results[0].formatted_address,
-    this.latitude = location.body.results[0].geometry.location.lat,
-    this.longitude = location.body.results[0].geometry.location.lng
+  this.search_query = search;
+  this.formatted_query = location.body.results[0].formatted_address;
+  this.latitude = location.body.results[0].geometry.location.lat;
+  this.longitude = location.body.results[0].geometry.location.lng;
 }
 
 // Weather helper function
