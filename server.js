@@ -15,15 +15,15 @@ require('dotenv').config();
 const PORT = process.env.PORT;
 
 // The following app.get() will call the correct helper function to retrieve the API information.
-app.get('/location', getGoogleLocation); //google API
+app.get('/location', getLocation); //google API
 app.get('/weather', getWeather); //darkskies API
 app.get('/yelp', getRestaurants); // yelp API
-app.get('/movies', getMovies); // The Movie Database API
+app.get('/movies', getMovies); // the movie database API
 
-// Tells the server to listen to the PORT, and console.logs to tell us it's on.
+// Tells the server to start listening to the PORT, and console.logs to tell us it's on.
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
-// HELPER FUNCTIONS AND CONSTRUCTORS BELOW //
+// CONSTRUCTORS BELOW //
 
 // Constructor function for Darksky API
 function WeatherResult(weather) {
@@ -40,9 +40,7 @@ function RestaurantResult(restaurant) {
     this.url = restaurant.url
 }
 
-
 //Constructor function for The Movie Database API
-//Constructor function for Yelp API
 function MovieResults(movie) {
   this.title = movie.title,
     this.overview = movie.overview,
@@ -53,28 +51,22 @@ function MovieResults(movie) {
     this.released_on = movie.release_date
 }
 
-
-
-
-
-
 // Google helper function refactored prior to lab start.
-function getGoogleLocation(request, response) {
+function getLocation(request, response) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${request.query.data}&key=${process.env.GOOGLE_API_KEY}`;
   return superagent.get(url)
-    .then(result => {
-
-      response.send(new LocationResult(request.query.data, result.body.results[0].formatted_address, result.body.results[0].geometry.location.lat, result.body.results[0].geometry.location.lng));
+    .then(location => {
+      response.send(new LocationResult(request.query.data, location));
     })
     .catch(error => processError(error, response));
 }
 
 // Contructor function for Google API
-function LocationResult(search, formatted, lat, lng) {
+function LocationResult(search, location) {
   this.search_query = search,
-    this.formatted_query = formatted,
-    this.latitude = lat,
-    this.longitude = lng
+    this.formatted_query = location.body.results[0].formatted_address,
+    this.latitude = location.body.results[0].geometry.location.lat,
+    this.longitude = location.body.results[0].geometry.location.lng
 }
 
 // Weather helper function
@@ -95,7 +87,7 @@ function getWeather(request, response) {
 function getRestaurants(request, response) {
   const url = `https://api.yelp.com/v3/businesses/search?location=${request.query.data.search_query}`;
 
-  superagent.get(url)
+  return superagent.get(url)
     .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .then(result => {
       let yelpData = [];
@@ -121,13 +113,8 @@ function getMovies(request, response) {
     .catch(error => processError(error, response));
 }
 
-// Error handeling function
+// Error handeling helper function
 function processError(err, res) {
   console.error(err);
   if (res) res.status(500).send('Sorry, something went wrong');
 }
-
-
-
-
-
